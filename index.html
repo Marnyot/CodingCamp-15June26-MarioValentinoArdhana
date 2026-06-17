@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Dashboard</title>
+
+  <!-- Anti-flash: apply saved theme before CSS/body is parsed -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('dashboard_theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="dashboard-header">
+    <h1 class="dashboard-title">Dashboard</h1>
+    <!-- Theme_Toggle: button toggling light/dark mode -->
+    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">🌙</button>
+  </header>
+
+  <main class="dashboard-main">
+
+    <!-- Greeting_Widget: live clock, date, time-based greeting, custom name -->
+    <section id="greeting-section" class="widget greeting-widget" aria-label="Greeting">
+      <div id="clock" class="clock">--:--:--</div>
+      <div id="date" class="date">Loading date…</div>
+      <div id="greeting-text" class="greeting-text">Hello</div>
+      <form id="name-form" class="name-form" autocomplete="off">
+        <input
+          id="name-input"
+          type="text"
+          class="name-input"
+          placeholder="Enter your name…"
+          maxlength="50"
+          aria-label="Your name"
+        >
+        <button type="submit" class="btn btn-small">Save</button>
+      </form>
+    </section>
+
+    <!-- Focus_Timer: 25-minute Pomodoro countdown -->
+    <section id="timer-section" class="widget timer-widget" aria-label="Focus Timer">
+      <h2 class="widget-title">Focus Timer</h2>
+      <div id="timer-display" class="timer-display">25:00</div>
+      <div class="timer-controls">
+        <button id="timer-start" class="btn">Start</button>
+        <button id="timer-stop" class="btn">Stop</button>
+        <button id="timer-reset" class="btn btn-secondary">Reset</button>
+      </div>
+      <div id="timer-notification" class="timer-notification hidden" role="alert">
+        🎉 Pomodoro complete! Take a break.
+      </div>
+    </section>
+
+    <!-- Task_Manager: add, edit, complete, delete, sort tasks -->
+    <section id="tasks-section" class="widget tasks-widget" aria-label="Task Manager">
+      <h2 class="widget-title">Tasks</h2>
+      <form id="task-add-form" class="add-form" autocomplete="off">
+        <input
+          id="task-input"
+          type="text"
+          class="text-input"
+          placeholder="Add a task…"
+          maxlength="500"
+          aria-label="New task description"
+        >
+        <button type="submit" class="btn">Add</button>
+      </form>
+      <p id="tasks-error" class="error-msg" role="alert" aria-live="polite"></p>
+      <div class="sort-controls" role="group" aria-label="Sort tasks">
+        <button id="sort-all" class="btn btn-sort btn-sort-active">All</button>
+        <button id="sort-active" class="btn btn-sort">Active</button>
+        <button id="sort-completed" class="btn btn-sort">Completed</button>
+      </div>
+      <ul id="task-list" class="task-list" aria-label="Task list"></ul>
+    </section>
+
+    <!-- Quick_Links: add and open URL shortcuts -->
+    <section id="links-section" class="widget links-widget" aria-label="Quick Links">
+      <h2 class="widget-title">Quick Links</h2>
+      <form id="link-add-form" class="add-form" autocomplete="off">
+        <input
+          id="link-label-input"
+          type="text"
+          class="text-input"
+          placeholder="Label"
+          maxlength="50"
+          aria-label="Link label"
+        >
+        <input
+          id="link-url-input"
+          type="text"
+          class="text-input"
+          placeholder="URL"
+          maxlength="2048"
+          aria-label="Link URL"
+        >
+        <button type="submit" class="btn">Add</button>
+      </form>
+      <p id="links-error" class="error-msg" role="alert" aria-live="polite"></p>
+      <div id="link-grid" class="link-grid"></div>
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
