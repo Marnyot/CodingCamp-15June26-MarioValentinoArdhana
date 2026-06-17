@@ -650,7 +650,7 @@ function _tasksRender() {
     var doneClass = task.done ? ' done' : '';
     var checkedAttr = task.done ? ' checked' : '';
     html +=
-      '<li data-task-id="' + task.id + '">' +
+      '<li class="task-item" data-task-id="' + task.id + '">' +
         '<input type="checkbox" class="task-checkbox" aria-label="Mark complete"' + checkedAttr + '>' +
         '<span class="task-text' + doneClass + '">' + _escapeHtml(task.text) + '</span>' +
         '<button class="btn btn-small task-edit-btn" type="button" aria-label="Edit task">Edit</button>' +
