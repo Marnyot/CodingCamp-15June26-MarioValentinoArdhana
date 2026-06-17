@@ -481,46 +481,626 @@ Dashboard.timer = {
 };
 
 /* ==========================================================================
-   Dashboard.tasks — Task_Manager module
-   (implementation added in Task 7)
+   Pure helper functions — Task_Manager helpers
+   Requirements: 5.2, 5.3, 5.4, 5.6, 5.7, 5.9, 5.10, 6.1, 6.2
    ========================================================================== */
+
+/**
+ * Generate a lightweight unique string ID.
+ * Combines the current timestamp in base-36 with random base-36 characters.
+ * @returns {string}
+ */
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+/**
+ * Pure function — return a new tasks array with one item appended, or null if
+ * the text is invalid (empty/whitespace or exceeds 500 chars).
+ * Does NOT mutate the input array.
+ * @param {Array}  tasks  Current task list
+ * @param {string} text   Raw input from the user
+ * @returns {Array|null}  New array on success, null on validation failure
+ * Requirements: 5.2, 5.9
+ */
+function addTask(tasks, text) {
+  var trimmed = String(text).trim();
+  if (trimmed.length < 1 || trimmed.length > 500) {
+    return null;
+  }
+  return tasks.concat([{
+    id:        generateId(),
+    text:      trimmed,
+    done:      false,
+    createdAt: Date.now()
+  }]);
+}
+
+/**
+ * Pure function — return a new tasks array with the task matching `id` removed.
+ * Does NOT mutate the input array.
+ * @param {Array}  tasks
+ * @param {string} id
+ * @returns {Array}
+ * Requirements: 5.7
+ */
+function deleteTask(tasks, id) {
+  return tasks.filter(function (task) {
+    return task.id !== id;
+  });
+}
+
+/**
+ * Pure function — return a new tasks array with the matching task's `done`
+ * field flipped. All other fields and all other tasks are unchanged.
+ * Does NOT mutate the input array.
+ * @param {Array}  tasks
+ * @param {string} id
+ * @returns {Array}
+ * Requirements: 5.3, 5.4
+ */
+function toggleComplete(tasks, id) {
+  return tasks.map(function (task) {
+    if (task.id === id) {
+      return { id: task.id, text: task.text, done: !task.done, createdAt: task.createdAt };
+    }
+    return task;
+  });
+}
+
+/**
+ * Pure function — return a new tasks array with the matching task's `text`
+ * updated to newText.trim(). Returns the original array unchanged (same or
+ * equivalent) when newText is empty/whitespace or exceeds 500 chars.
+ * Does NOT mutate the input array.
+ * @param {Array}  tasks
+ * @param {string} id
+ * @param {string} newText
+ * @returns {Array}
+ * Requirements: 5.6, 5.10
+ */
+function saveEdit(tasks, id, newText) {
+  var trimmed = String(newText).trim();
+  if (trimmed.length < 1 || trimmed.length > 500) {
+    // Validation failed — return a shallow copy to keep immutability contract
+    return tasks.slice();
+  }
+  return tasks.map(function (task) {
+    if (task.id === id) {
+      return { id: task.id, text: trimmed, done: task.done, createdAt: task.createdAt };
+    }
+    return task;
+  });
+}
+
+/**
+ * Pure function — return a new sorted array for display purposes.
+ * NEVER mutates the input tasks array.
+ *
+ *   'all'       → creation order (as stored)
+ *   'active'    → incomplete (done===false) first, then complete (done===true);
+ *                 ties within each group sorted by createdAt ascending
+ *   'completed' → complete (done===true) first, then incomplete (done===false);
+ *                 ties within each group sorted by createdAt ascending
+ *
+ * @param {Array}  tasks
+ * @param {string} mode  'all' | 'active' | 'completed'
+ * @returns {Array}
+ * Requirements: 6.1, 6.2
+ */
+function sortTasks(tasks, mode) {
+  if (mode === 'all') {
+    return tasks.slice(); // preserve creation order
+  }
+
+  // For 'active': primary sort key — done===false before done===true (false=0, true=1)
+  // For 'completed': primary sort key — done===true before done===false (true=0 means first)
+  var copy = tasks.slice();
+  copy.sort(function (a, b) {
+    var aKey, bKey;
+    if (mode === 'active') {
+      // false (0) sorts before true (1) — incomplete first
+      aKey = a.done ? 1 : 0;
+      bKey = b.done ? 1 : 0;
+    } else {
+      // 'completed': true (0) sorts before false (1) — complete first
+      aKey = a.done ? 0 : 1;
+      bKey = b.done ? 0 : 1;
+    }
+    if (aKey !== bKey) {
+      return aKey - bKey;
+    }
+    // Tie-break by createdAt ascending (oldest first within each group)
+    return a.createdAt - b.createdAt;
+  });
+  return copy;
+}
+
+// Expose pure task helpers on Dashboard namespace for testability
+Dashboard.generateId     = generateId;
+Dashboard.addTask        = addTask;
+Dashboard.deleteTask     = deleteTask;
+Dashboard.toggleComplete = toggleComplete;
+Dashboard.saveEdit       = saveEdit;
+Dashboard.sortTasks      = sortTasks;
+
+/* ==========================================================================
+   Dashboard.tasks — Task_Manager module
+   Requirements: 5.1–5.11, 6.1–6.4, 9.4
+   ========================================================================== */
+
+/** Module-level task state */
+var _tasksState = { tasks: [], sortMode: 'all' };
+
+/**
+ * Internal render — rebuilds #task-list and updates sort button active states.
+ * Not exposed on the public API.
+ * @private
+ */
+function _tasksRender() {
+  var list = document.getElementById('task-list');
+  if (!list) { return; }
+
+  var displayTasks = sortTasks(_tasksState.tasks, _tasksState.sortMode);
+
+  // Rebuild the task list HTML
+  var html = '';
+  for (var i = 0; i < displayTasks.length; i++) {
+    var task = displayTasks[i];
+    var doneClass = task.done ? ' done' : '';
+    var checkedAttr = task.done ? ' checked' : '';
+    html +=
+      '<li data-task-id="' + task.id + '">' +
+        '<input type="checkbox" class="task-checkbox" aria-label="Mark complete"' + checkedAttr + '>' +
+        '<span class="task-text' + doneClass + '">' + _escapeHtml(task.text) + '</span>' +
+        '<button class="btn btn-small task-edit-btn" type="button" aria-label="Edit task">Edit</button>' +
+        '<button class="btn btn-small btn-secondary task-delete-btn" type="button" aria-label="Delete task">Delete</button>' +
+      '</li>';
+  }
+  list.innerHTML = html;
+
+  // Attach event listeners to each task item
+  var items = list.querySelectorAll('li[data-task-id]');
+  for (var j = 0; j < items.length; j++) {
+    (function (li) {
+      var id = li.getAttribute('data-task-id');
+
+      var checkbox = li.querySelector('.task-checkbox');
+      if (checkbox) {
+        checkbox.addEventListener('change', function () {
+          Dashboard.tasks.toggleComplete(id);
+        });
+      }
+
+      var editBtn = li.querySelector('.task-edit-btn');
+      if (editBtn) {
+        editBtn.addEventListener('click', function () {
+          Dashboard.tasks.beginEdit(id);
+        });
+      }
+
+      var deleteBtn = li.querySelector('.task-delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', function () {
+          Dashboard.tasks.deleteTask(id);
+        });
+      }
+    })(items[j]);
+  }
+
+  // Update sort button active states
+  var sortAll       = document.getElementById('sort-all');
+  var sortActive    = document.getElementById('sort-active');
+  var sortCompleted = document.getElementById('sort-completed');
+
+  if (sortAll)       { sortAll.classList.toggle('btn-sort-active',       _tasksState.sortMode === 'all'); }
+  if (sortActive)    { sortActive.classList.toggle('btn-sort-active',    _tasksState.sortMode === 'active'); }
+  if (sortCompleted) { sortCompleted.classList.toggle('btn-sort-active', _tasksState.sortMode === 'completed'); }
+
+  // Clear any existing error on successful render
+  var errorEl = document.getElementById('tasks-error');
+  if (errorEl) { errorEl.textContent = ''; }
+}
+
+/**
+ * Escape HTML special characters to prevent XSS in innerHTML.
+ * @param {string} str
+ * @returns {string}
+ * @private
+ */
+function _escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Dashboard.tasks = {
+  /**
+   * Initialise the Task_Manager widget:
+   *   - Load saved tasks from localStorage (default [])
+   *   - Set default sort mode to 'all'
+   *   - Render the task list
+   *   - Register the add-form submit handler
+   *   - Wire the sort buttons
+   * Requirements: 5.2, 5.8, 6.4, 9.4
+   */
   init: function () {
-    // stub — implemented in Task 7
+    var saved = Dashboard.storage.get('dashboard_tasks');
+    _tasksState.tasks    = Array.isArray(saved) ? saved : [];
+    _tasksState.sortMode = 'all';
+
+    _tasksRender();
+
+    // Register add-form submit handler
+    var form = document.getElementById('task-add-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var input = document.getElementById('task-input');
+        var value = input ? input.value : '';
+        var result = Dashboard.tasks.addTask(value);
+        // Clear the input only on success (addTask returns truthy on success)
+        if (result !== false && input) {
+          input.value = '';
+        }
+      });
+    }
+
+    // Wire sort buttons
+    var sortAllBtn = document.getElementById('sort-all');
+    if (sortAllBtn) {
+      sortAllBtn.addEventListener('click', function () {
+        Dashboard.tasks.setSortMode('all');
+      });
+    }
+
+    var sortActiveBtn = document.getElementById('sort-active');
+    if (sortActiveBtn) {
+      sortActiveBtn.addEventListener('click', function () {
+        Dashboard.tasks.setSortMode('active');
+      });
+    }
+
+    var sortCompletedBtn = document.getElementById('sort-completed');
+    if (sortCompletedBtn) {
+      sortCompletedBtn.addEventListener('click', function () {
+        Dashboard.tasks.setSortMode('completed');
+      });
+    }
   },
+
+  /**
+   * Add a new task to the list.
+   * Shows an error in #tasks-error if text is empty/whitespace.
+   * Persists and re-renders on success.
+   * @param {string} text
+   * @returns {boolean} true on success, false on validation failure
+   * Requirements: 5.2, 5.9, 5.11, 9.4
+   */
   addTask: function (text) {
-    // stub — implemented in Task 7
+    var result = addTask(_tasksState.tasks, text);
+    if (result === null) {
+      var errorEl = document.getElementById('tasks-error');
+      if (errorEl) { errorEl.textContent = 'Task cannot be empty'; }
+      return false;
+    }
+    _tasksState.tasks = result;
+    Dashboard.storage.set('dashboard_tasks', _tasksState.tasks);
+    _tasksRender();
+    return true;
   },
+
+  /**
+   * Remove a task by id. Persists and re-renders.
+   * @param {string} id
+   * Requirements: 5.7, 9.4
+   */
   deleteTask: function (id) {
-    // stub — implemented in Task 7
+    _tasksState.tasks = deleteTask(_tasksState.tasks, id);
+    Dashboard.storage.set('dashboard_tasks', _tasksState.tasks);
+    _tasksRender();
   },
+
+  /**
+   * Toggle the completion status of a task by id. Persists and re-renders.
+   * @param {string} id
+   * Requirements: 5.3, 5.4, 9.4
+   */
   toggleComplete: function (id) {
-    // stub — implemented in Task 7
+    _tasksState.tasks = toggleComplete(_tasksState.tasks, id);
+    Dashboard.storage.set('dashboard_tasks', _tasksState.tasks);
+    _tasksRender();
   },
+
+  /**
+   * Replace the task list item for the given id with an inline edit field.
+   * The edit field is pre-filled with the current task text.
+   * @param {string} id
+   * Requirements: 5.5, 5.6
+   */
   beginEdit: function (id) {
-    // stub — implemented in Task 7
+    var list = document.getElementById('task-list');
+    if (!list) { return; }
+
+    var li = list.querySelector('li[data-task-id="' + id + '"]');
+    if (!li) { return; }
+
+    // Find the current task text
+    var task = null;
+    for (var i = 0; i < _tasksState.tasks.length; i++) {
+      if (_tasksState.tasks[i].id === id) {
+        task = _tasksState.tasks[i];
+        break;
+      }
+    }
+    if (!task) { return; }
+
+    // Replace li contents with inline edit UI
+    li.innerHTML =
+      '<input type="text" class="text-input task-edit-input" maxlength="500" aria-label="Edit task text" value="' + _escapeHtml(task.text) + '">' +
+      '<button class="btn btn-small task-save-btn" type="button">Save</button>' +
+      '<button class="btn btn-small btn-secondary task-cancel-btn" type="button">Cancel</button>' +
+      '<span class="error-msg task-edit-error"></span>';
+
+    var editInput  = li.querySelector('.task-edit-input');
+    var saveBtn    = li.querySelector('.task-save-btn');
+    var cancelBtn  = li.querySelector('.task-cancel-btn');
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', function () {
+        var val = editInput ? editInput.value : '';
+        Dashboard.tasks.saveEdit(id, val);
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function () {
+        _tasksRender();
+      });
+    }
+
+    // Focus the input for immediate typing
+    if (editInput) {
+      editInput.focus();
+      // Place cursor at end
+      var len = editInput.value.length;
+      editInput.setSelectionRange(len, len);
+    }
   },
+
+  /**
+   * Save an edited task description.
+   * Shows an error near the edit field if text is empty/whitespace.
+   * Persists and re-renders on success.
+   * @param {string} id
+   * @param {string} text
+   * Requirements: 5.6, 5.10, 5.11, 9.4
+   */
   saveEdit: function (id, text) {
-    // stub — implemented in Task 7
+    var trimmed = String(text).trim();
+    if (trimmed.length < 1 || trimmed.length > 500) {
+      // Show error near the edit field
+      var list = document.getElementById('task-list');
+      if (list) {
+        var li = list.querySelector('li[data-task-id="' + id + '"]');
+        if (li) {
+          var errEl = li.querySelector('.task-edit-error');
+          if (errEl) { errEl.textContent = 'Task cannot be empty'; }
+        }
+      }
+      return;
+    }
+    var result = saveEdit(_tasksState.tasks, id, text);
+    _tasksState.tasks = result;
+    Dashboard.storage.set('dashboard_tasks', _tasksState.tasks);
+    _tasksRender();
   },
+
+  /**
+   * Change the active sort mode and re-render.
+   * Does NOT write to localStorage — sort is view-only.
+   * @param {string} mode  'all' | 'active' | 'completed'
+   * Requirements: 6.1, 6.2, 6.3
+   */
   setSortMode: function (mode) {
-    // stub — implemented in Task 7
+    _tasksState.sortMode = mode;
+    _tasksRender();
   }
 };
 
 /* ==========================================================================
-   Dashboard.links — Quick_Links module
-   (implementation added in Task 9)
+   Pure helper functions — Quick_Links helpers
+   Requirements: 7.2, 7.4, 7.6, 7.7
    ========================================================================== */
+
+/**
+ * Normalise a URL by prepending "https://" if it does not already have an
+ * http:// or https:// scheme (case-insensitive).
+ * @param {string} url
+ * @returns {string}
+ * Requirements: 7.7
+ */
+function normaliseUrl(url) {
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  return 'https://' + url;
+}
+
+/**
+ * Pure function — return a new links array with one item appended, or null if
+ * any validation fails:
+ *   - label.trim().length >= 1 and <= 50
+ *   - url.trim().length >= 1 and <= 2048
+ *   - links.length < 50 (cap at 50 entries)
+ * Does NOT mutate the input array.
+ * @param {Array}  links  Current links list
+ * @param {string} label  Raw label input
+ * @param {string} url    Raw URL input
+ * @returns {Array|null}  New array on success, null on validation failure
+ * Requirements: 7.2, 7.6, 7.7
+ */
+function addLink(links, label, url) {
+  var trimmedLabel = String(label).trim();
+  var trimmedUrl   = String(url).trim();
+
+  if (
+    trimmedLabel.length < 1 ||
+    trimmedLabel.length > 50 ||
+    trimmedUrl.length < 1 ||
+    trimmedUrl.length > 2048 ||
+    links.length >= 50
+  ) {
+    return null;
+  }
+
+  return links.concat([{
+    id:    generateId(),
+    label: trimmedLabel,
+    url:   normaliseUrl(trimmedUrl)
+  }]);
+}
+
+/**
+ * Pure function — return a new links array with the link matching `id` removed.
+ * Does NOT mutate the input array.
+ * @param {Array}  links
+ * @param {string} id
+ * @returns {Array}
+ * Requirements: 7.4
+ */
+function deleteLink(links, id) {
+  return links.filter(function (link) {
+    return link.id !== id;
+  });
+}
+
+// Expose pure link helpers on Dashboard namespace for testability
+Dashboard.normaliseUrl = normaliseUrl;
+Dashboard.addLink      = addLink;
+Dashboard.deleteLink   = deleteLink;
+
+/* ==========================================================================
+   Dashboard.links — Quick_Links module
+   Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7
+   ========================================================================== */
+
+/** Module-level links state */
+var _linksState = { links: [] };
+
+/**
+ * Internal render — rebuilds #link-grid from current state.
+ * Not exposed on the public API.
+ * @private
+ */
+function _linksRender() {
+  var grid = document.getElementById('link-grid');
+  if (!grid) { return; }
+
+  var html = '';
+  for (var i = 0; i < _linksState.links.length; i++) {
+    var link = _linksState.links[i];
+    html +=
+      '<div class="link-item">' +
+        '<a href="' + _escapeHtml(link.url) + '" target="_blank" rel="noopener noreferrer" class="link-btn">' +
+          _escapeHtml(link.label) +
+        '</a>' +
+        '<button class="btn btn-icon btn-small" type="button" data-link-id="' + _escapeHtml(link.id) + '" aria-label="Delete link">✕</button>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+
+  // Attach delete listeners
+  var deleteBtns = grid.querySelectorAll('button[data-link-id]');
+  for (var j = 0; j < deleteBtns.length; j++) {
+    (function (btn) {
+      var id = btn.getAttribute('data-link-id');
+      btn.addEventListener('click', function () {
+        Dashboard.links.deleteLink(id);
+      });
+    })(deleteBtns[j]);
+  }
+
+  // Clear error on successful render
+  var errorEl = document.getElementById('links-error');
+  if (errorEl) { errorEl.textContent = ''; }
+}
+
 Dashboard.links = {
+  /**
+   * Initialise the Quick_Links widget:
+   *   - Load saved links from localStorage (default [])
+   *   - Render the link grid
+   *   - Register submit listener on #link-add-form
+   * Requirements: 7.1, 7.5
+   */
   init: function () {
-    // stub — implemented in Task 9
+    var saved = Dashboard.storage.get('dashboard_links');
+    _linksState.links = Array.isArray(saved) ? saved : [];
+
+    _linksRender();
+
+    var form = document.getElementById('link-add-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var labelInput = document.getElementById('link-label-input');
+        var urlInput   = document.getElementById('link-url-input');
+        var label = labelInput ? labelInput.value : '';
+        var url   = urlInput   ? urlInput.value   : '';
+
+        var ok = Dashboard.links.addLink(label, url);
+        if (ok) {
+          if (labelInput) { labelInput.value = ''; }
+          if (urlInput)   { urlInput.value   = ''; }
+        }
+      });
+    }
   },
+
+  /**
+   * Add a new link to the list.
+   * Shows an error in #links-error if validation fails.
+   * Shows a specific error if the 50-link cap is reached.
+   * Persists and re-renders on success.
+   * @param {string} label
+   * @param {string} url
+   * @returns {boolean} true on success, false on validation failure
+   * Requirements: 7.2, 7.6, 7.7
+   */
   addLink: function (label, url) {
-    // stub — implemented in Task 9
+    // Check cap first for a specific error message
+    if (_linksState.links.length >= 50) {
+      var capErrorEl = document.getElementById('links-error');
+      if (capErrorEl) { capErrorEl.textContent = 'Maximum 50 links reached'; }
+      return false;
+    }
+
+    var result = addLink(_linksState.links, label, url);
+    if (result === null) {
+      var errorEl = document.getElementById('links-error');
+      if (errorEl) { errorEl.textContent = 'Invalid link — check label and URL'; }
+      return false;
+    }
+
+    _linksState.links = result;
+    Dashboard.storage.set('dashboard_links', _linksState.links);
+    _linksRender();
+    return true;
   },
+
+  /**
+   * Remove a link by id. Persists and re-renders.
+   * @param {string} id
+   * Requirements: 7.4, 9.4
+   */
   deleteLink: function (id) {
-    // stub — implemented in Task 9
+    _linksState.links = deleteLink(_linksState.links, id);
+    Dashboard.storage.set('dashboard_links', _linksState.links);
+    _linksRender();
   }
 };
 
