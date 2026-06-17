@@ -166,7 +166,7 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - `deleteLink(links, id)`: returns new array with matching id removed
     - _Requirements: 7.2, 7.4, 7.6, 7.7_
 
-  - [ ]* 9.2 Write property tests for link operations in `test/unit/links.test.js`
+  - [x] 9.2 Write property tests for link operations in `test/unit/links.test.js`
     - **Property 20: Quick link add and URL normalisation round-trip** — `addLink(links, l, u)` where links.length < 50 stores `label === l.trim()` and url starts with `http://` or `https://`
     - **Validates: Requirements 7.2, 7.7**
     - **Property 21: URL scheme is always normalised to https when absent** — any URL not starting with `http://` or `https://` is stored as `"https://" + u`
@@ -186,18 +186,18 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - `deleteLink(id)`: calls pure `deleteLink`; updates state, persists, re-renders
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
-  - [ ]* 9.4 Write unit (example-based) tests for Quick_Links in `test/unit/links.test.js`
+  - [x] 9.4 Write unit (example-based) tests for Quick_Links in `test/unit/links.test.js`
     - Test link with `http://` scheme is not double-prefixed
     - Test link with uppercase `HTTP://` scheme is not double-prefixed (case-insensitive check)
     - Test adding a link with a label > 50 chars is rejected
     - Test `dashboard_links` key is written immediately on link add (Requirements 9.4)
     - _Requirements: 7.6, 7.7, 9.4_
 
-- [ ] 10. Checkpoint — links module complete
+- [x] 10. Checkpoint — links module complete
   - Ensure all tests pass with `node test/run.js`, ask the user if questions arise.
 
-- [ ] 11. Wire all modules and finalise `index.html` markup
-  - [ ] 11.1 Write complete HTML markup for all five widget sections in `index.html`
+- [x] 11. Wire all modules and finalise `index.html` markup
+  - [x] 11.1 Write complete HTML markup for all five widget sections in `index.html`
     - `#greeting-section`: `#clock`, `#date`, `#greeting-text`, `#name-input` (inline text input + submit)
     - `#timer-section`: timer display `#timer-display`, Start/Stop/Reset buttons, `#timer-notification` (hidden by default)
     - `#tasks-section`: add-task form, `#tasks-error`, sort mode buttons, `#task-list` container
@@ -205,15 +205,15 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - `#theme-toggle`: header button with light/dark icon
     - _Requirements: 10.4_
 
-  - [ ] 11.2 Complete `css/style.css` with widget-specific layout rules, input/button styles, error message styles, task strikethrough for `.done`, and responsive layout for screens ≥ 320 px width
+  - [x] 11.2 Complete `css/style.css` with widget-specific layout rules, input/button styles, error message styles, task strikethrough for `.done`, and responsive layout for screens ≥ 320 px width
     - Ensure all interactive controls meet minimum 44×44 px touch target size
     - _Requirements: 5.3, 10.3_
 
-  - [ ] 11.3 Verify `DOMContentLoaded` handler in `js/app.js` calls all five `init()` functions in order: `theme.init()`, `greeting.init()`, `timer.init()`, `tasks.init()`, `links.init()`
+  - [x] 11.3 Verify `DOMContentLoaded` handler in `js/app.js` calls all five `init()` functions in order: `theme.init()`, `greeting.init()`, `timer.init()`, `tasks.init()`, `links.init()`
     - Theme must be initialised first to prevent flash; all other modules in any order after
     - _Requirements: 8.4, 10.4_
 
-- [ ] 12. Final checkpoint — full integration
+- [x] 12. Final checkpoint — full integration
   - Ensure all tests pass with `node test/run.js`, ask the user if questions arise.
   - Verify `index.html` opens via `file://` in Chrome and all five widgets render and respond to input.
 
