@@ -107,11 +107,11 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - Test completion notification appears when `remaining` reaches 0
     - _Requirements: 4.1, 4.3, 4.5, 4.8_
 
-- [-] 6. Checkpoint — storage, theme, greeting, and timer complete
+- [x] 6. Checkpoint — storage, theme, greeting, and timer complete
   - Ensure all tests pass with `node test/run.js`, ask the user if questions arise.
 
-- [ ] 7. Implement `Dashboard.tasks` — Task_Manager module
-  - [ ] 7.1 Write pure helper functions for task operations in `js/app.js`
+- [x] 7. Implement `Dashboard.tasks` — Task_Manager module
+  - [x] 7.1 Write pure helper functions for task operations in `js/app.js`
     - `generateId()`: returns `Date.now().toString(36) + Math.random().toString(36).slice(2)`
     - `addTask(tasks, text)`: validates `text.trim().length >= 1` and `<= 500`; returns new array with appended `{ id, text: text.trim(), done: false, createdAt: Date.now() }`; throws or returns `null` on invalid input
     - `deleteTask(tasks, id)`: returns new array with the matching id removed
@@ -141,7 +141,7 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - **Validates: Requirements 6.1**
     - _Requirements: 5.2, 5.3, 5.4, 5.6, 5.7, 5.9, 5.10, 6.1, 6.2, 9.4_
 
-  - [ ] 7.3 Write the `Dashboard.tasks` widget module (`init`, `addTask`, `deleteTask`, `toggleComplete`, `beginEdit`, `saveEdit`, `setSortMode`) in `js/app.js`
+  - [x] 7.3 Write the `Dashboard.tasks` widget module (`init`, `addTask`, `deleteTask`, `toggleComplete`, `beginEdit`, `saveEdit`, `setSortMode`) in `js/app.js`
     - `init()`: loads `dashboard_tasks` array from storage (default `[]`); sets `state.sortMode = 'all'`; calls `render()`; registers listener on add-task form
     - `render()`: computes display list via `sortTasks(state.tasks, state.sortMode)`; rebuilds `#tasks-section` list via `innerHTML`; each item has complete-toggle, edit button, and delete button
     - `addTask(text)`: calls pure `addTask`; on success updates `state.tasks`, writes to storage, re-renders; on failure shows inline error message in `#tasks-error`
@@ -156,11 +156,11 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - Test `localStorage` key `dashboard_tasks` is written immediately on task add (Requirements 9.4)
     - _Requirements: 5.11, 6.4, 9.4_
 
-- [ ] 8. Checkpoint — task module complete
+- [x] 8. Checkpoint — task module complete
   - Ensure all tests pass with `node test/run.js`, ask the user if questions arise.
 
-- [ ] 9. Implement `Dashboard.links` — Quick_Links module
-  - [ ] 9.1 Write pure helper functions for link operations in `js/app.js`
+- [x] 9. Implement `Dashboard.links` — Quick_Links module
+  - [x] 9.1 Write pure helper functions for link operations in `js/app.js`
     - `normaliseUrl(url)`: returns `url` unchanged if it matches `/^https?:\/\//i`; otherwise prepends `"https://"`
     - `addLink(links, label, url)`: validates `label.trim().length >= 1`, `url.trim().length >= 1`, `url.trim().length <= 2048`, `label.trim().length <= 50`, and `links.length < 50`; returns new array with appended `{ id: generateId(), label: label.trim(), url: normaliseUrl(url.trim()) }`; returns `null` on invalid input
     - `deleteLink(links, id)`: returns new array with matching id removed
@@ -179,7 +179,7 @@ Implement a zero-dependency, single-page Personal Dashboard as three static file
     - **Validates: Requirements 7.6**
     - _Requirements: 7.2, 7.4, 7.6, 7.7_
 
-  - [ ] 9.3 Write the `Dashboard.links` widget module (`init`, `addLink`, `deleteLink`) in `js/app.js`
+  - [x] 9.3 Write the `Dashboard.links` widget module (`init`, `addLink`, `deleteLink`) in `js/app.js`
     - `init()`: loads `dashboard_links` from storage (default `[]`); calls `render()`; registers listener on add-link form
     - `render()`: rebuilds `#links-section` link grid; each link renders as `<a href="{url}" target="_blank" rel="noopener noreferrer">`; each item has a delete button
     - `addLink(label, url)`: calls pure `addLink`; on success updates `state.links`, writes `dashboard_links` to storage, re-renders; on failure shows inline error in `#links-error`
