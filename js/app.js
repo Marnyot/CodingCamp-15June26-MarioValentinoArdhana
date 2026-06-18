@@ -499,6 +499,24 @@ function generateId() {
 }
 
 /**
+ * Pure function — check if a task with the given text already exists
+ * in the tasks array (case-insensitive comparison).
+ * Does NOT mutate the input array.
+ * @param {Array}  tasks
+ * @param {string} text
+ * @returns {boolean}
+ */
+function isDuplicateTask(tasks, text) {
+  var trimmed = String(text).trim();
+  for (var i = 0; i < tasks.length; i++) {
+    if (tasks[i].text.toLowerCase() === trimmed.toLowerCase()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Pure function — return a new tasks array with one item appended, or null if
  * the text is invalid (empty/whitespace or exceeds 500 chars).
  * Does NOT mutate the input array.
@@ -622,6 +640,7 @@ function sortTasks(tasks, mode) {
 
 // Expose pure task helpers on Dashboard namespace for testability
 Dashboard.generateId     = generateId;
+Dashboard.isDuplicateTask = isDuplicateTask;
 Dashboard.addTask        = addTask;
 Dashboard.deleteTask     = deleteTask;
 Dashboard.toggleComplete = toggleComplete;
@@ -778,20 +797,25 @@ Dashboard.tasks = {
 
   /**
    * Add a new task to the list.
-   * Shows an error in #tasks-error if text is empty/whitespace.
+   * Shows an error in #tasks-error if text is empty/whitespace or is a duplicate.
    * Persists and re-renders on success.
    * @param {string} text
-   * @returns {boolean} true on success, false on validation failure
+   * @returns {boolean} true on success, false on validation/duplicate failure
    * Requirements: 5.2, 5.9, 5.11, 9.4
    */
   addTask: function (text) {
-    var result = addTask(_tasksState.tasks, text);
-    if (result === null) {
+    var trimmed = String(text).trim();
+    if (trimmed.length < 1 || trimmed.length > 500) {
       var errorEl = document.getElementById('tasks-error');
       if (errorEl) { errorEl.textContent = 'Task cannot be empty'; }
       return false;
     }
-    _tasksState.tasks = result;
+    if (isDuplicateTask(_tasksState.tasks, text)) {
+      var errorEl = document.getElementById('tasks-error');
+      if (errorEl) { errorEl.textContent = 'Task already exists'; }
+      return false;
+    }
+    _tasksState.tasks = addTask(_tasksState.tasks, text);
     Dashboard.storage.set('dashboard_tasks', _tasksState.tasks);
     _tasksRender();
     return true;
@@ -877,7 +901,7 @@ Dashboard.tasks = {
 
   /**
    * Save an edited task description.
-   * Shows an error near the edit field if text is empty/whitespace.
+   * Shows an error near the edit field if text is empty/whitespace or is a duplicate.
    * Persists and re-renders on success.
    * @param {string} id
    * @param {string} text
@@ -893,6 +917,25 @@ Dashboard.tasks = {
         if (li) {
           var errEl = li.querySelector('.task-edit-error');
           if (errEl) { errEl.textContent = 'Task cannot be empty'; }
+        }
+      }
+      return;
+    }
+    // Check for duplicate (exclude the current task being edited)
+    var currentText = '';
+    for (var _i = 0; _i < _tasksState.tasks.length; _i++) {
+      if (_tasksState.tasks[_i].id === id) {
+        currentText = _tasksState.tasks[_i].text;
+        break;
+      }
+    }
+    if (trimmed.toLowerCase() !== currentText.toLowerCase() && isDuplicateTask(_tasksState.tasks, text)) {
+      var list = document.getElementById('task-list');
+      if (list) {
+        var li = list.querySelector('li[data-task-id="' + id + '"]');
+        if (li) {
+          var errEl = li.querySelector('.task-edit-error');
+          if (errEl) { errEl.textContent = 'Task already exists'; }
         }
       }
       return;
