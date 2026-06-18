@@ -346,6 +346,8 @@ Dashboard.tick        = tick;
 
 /** Module-level timer state */
 var _timerState = { remaining: 1500, running: false };
+/** Configured duration in seconds (default 25 min = 1500) */
+var _timerDuration = 1500;
 /** Handle for the 1-second interval ID (kept separate so tick() doesn't lose it) */
 var _timerIntervalId = null;
 /** Handle for the 5-second auto-dismiss timeout after completion */
@@ -372,9 +374,17 @@ Dashboard.timer = {
    * Requirements: 4.1, 4.7, 4.8
    */
   init: function () {
-    _timerState = { remaining: 1500, running: false };
+    var saved = Dashboard.storage.get('dashboard_timer_duration');
+    _timerDuration = (typeof saved === 'number' && saved > 0) ? saved : 1500;
+    _timerState = { remaining: _timerDuration, running: false };
     _timerIntervalId = null;
     _timerRender();
+
+    // Pre-populate duration input
+    var durInput = document.getElementById('timer-duration-input');
+    if (durInput) {
+      durInput.value = Math.round(_timerDuration / 60);
+    }
 
     var startBtn = document.getElementById('timer-start');
     if (startBtn) {
@@ -397,6 +407,19 @@ Dashboard.timer = {
       });
     }
 
+    // Duration form handler
+    var durForm = document.getElementById('timer-duration-form');
+    if (durForm) {
+      durForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var input = document.getElementById('timer-duration-input');
+        var val = input ? parseInt(input.value, 10) : NaN;
+        if (!isNaN(val) && val >= 1 && val <= 999) {
+          Dashboard.timer.setDuration(val);
+        }
+      });
+    }
+
     // Dismiss notification on any user interaction (Requirement 4.8)
     function _dismissNotification() {
       var notif = document.getElementById('timer-notification');
@@ -407,6 +430,25 @@ Dashboard.timer = {
 
     document.addEventListener('click', _dismissNotification);
     document.addEventListener('keydown', _dismissNotification);
+  },
+
+  /**
+   * Set a new timer duration in minutes.
+   * Resets the timer to the new duration and persists to localStorage.
+   * @param {number} minutes  Integer 1–999
+   * Requirements: 4.1
+   */
+  setDuration: function (minutes) {
+    minutes = Math.floor(minutes);
+    if (minutes < 1) { minutes = 1; }
+    if (minutes > 999) { minutes = 999; }
+    _timerDuration = minutes * 60;
+    Dashboard.storage.set('dashboard_timer_duration', _timerDuration);
+    // Reset with the new duration
+    Dashboard.timer.reset();
+    // Sync the input field
+    var input = document.getElementById('timer-duration-input');
+    if (input) { input.value = minutes; }
   },
 
   /**
@@ -471,7 +513,7 @@ Dashboard.timer = {
     clearTimeout(_timerNotifyTimeout);
     _timerNotifyTimeout = null;
 
-    _timerState = { remaining: 1500, running: false };
+    _timerState = { remaining: _timerDuration, running: false };
     _timerIntervalId = null;
 
     // Hide any visible notification immediately (Requirement 4.8)

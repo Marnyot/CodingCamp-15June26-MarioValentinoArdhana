@@ -52,6 +52,20 @@
         <button id="timer-stop" class="btn">Stop</button>
         <button id="timer-reset" class="btn btn-secondary">Reset</button>
       </div>
+      <div class="timer-duration-config">
+        <form id="timer-duration-form" class="duration-form" autocomplete="off">
+          <input
+            id="timer-duration-input"
+            type="number"
+            class="duration-input"
+            placeholder="Minutes"
+            min="1"
+            max="999"
+            aria-label="Set timer duration in minutes"
+          >
+          <button type="submit" class="btn btn-small">Set</button>
+        </form>
+      </div>
       <div id="timer-notification" class="timer-notification hidden" role="alert">
         🎉 Pomodoro complete! Take a break.
       </div>

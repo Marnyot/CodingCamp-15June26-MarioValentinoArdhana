@@ -218,6 +218,37 @@ body {
   margin-bottom: var(--space-md);
 }
 
+.timer-duration-config {
+  margin-top: var(--space-sm);
+}
+
+.duration-form {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  align-items: center;
+}
+
+.duration-input {
+  width: 90px;
+  height: 36px;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--font-size-md);
+  font-family: var(--font-family);
+  text-align: center;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.duration-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
 .timer-notification {
   margin-top: var(--space-md);
   padding: var(--space-sm) var(--space-md);
