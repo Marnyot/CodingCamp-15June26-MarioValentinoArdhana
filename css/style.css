@@ -1,30 +1,35 @@
-/* ==========================================================================
-   CSS Custom Properties — Light theme (default)
-   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
   /* Colours */
-  --bg:            #f5f5f5;
+  --bg:            #f0f4f8;
+  --bg-gradient:   linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
   --surface:       #ffffff;
-  --surface-alt:   #f0f0f0;
-  --border:        #d1d5db;
-  --text:          #111111;
-  --text-muted:    #6b7280;
-  --primary:       #4f46e5;
-  --primary-hover: #4338ca;
-  --danger:        #dc2626;
-  --danger-hover:  #b91c1c;
-  --success:       #16a34a;
+  --surface-alt:   #f1f5f9;
+  --surface-hover: #f8fafc;
+  --border:        #cbd5e1;
+  --text:          #0f172a;
+  --text-muted:    #64748b;
+  --primary:       #6366f1;
+  --primary-light: #e0e7ff;
+  --primary-hover: #4f46e5;
+  --primary-glow:  rgba(99, 102, 241, 0.25);
+  --danger:        #ef4444;
+  --danger-hover:  #dc2626;
+  --success:       #10b981;
+  --success-light: #d1fae5;
   --error-text:    #dc2626;
   --error-bg:      #fef2f2;
 
   /* Typography */
-  --font-family:   system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-size-sm:  0.875rem;
-  --font-size-md:  1rem;
-  --font-size-lg:  1.25rem;
+  --font-family:   'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-sm:  0.8125rem;
+  --font-size-md:  0.9375rem;
+  --font-size-lg:  1.125rem;
   --font-size-xl:  1.5rem;
   --font-size-2xl: 2rem;
-  --font-size-3xl: 3rem;
+  --font-size-3xl: 3.5rem;
+  --font-size-4xl: 4.5rem;
 
   /* Spacing */
   --space-xs:  0.25rem;
@@ -35,41 +40,45 @@
   --space-2xl: 3rem;
 
   /* Misc */
-  --radius:        0.5rem;
-  --radius-sm:     0.25rem;
-  --shadow:        0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md:     0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
-  --transition:    0.15s ease;
+  --radius:        1rem;
+  --radius-sm:     0.5rem;
+  --radius-xs:     0.25rem;
+  --shadow:        0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:     0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.03);
+  --shadow-lg:     0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.03);
+  --shadow-xl:     0 20px 40px rgba(0, 0, 0, 0.08);
+  --transition:    0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Minimum touch target */
   --touch-target:  44px;
 }
 
-/* ==========================================================================
-   Dark theme overrides — toggled by adding `.dark` to <html>
-   ========================================================================== */
 :root.dark {
-  --bg:            #0f0f1a;
+  --bg:            #0b0b1a;
+  --bg-gradient:   linear-gradient(135deg, #0b0b1a 0%, #15132b 100%);
   --surface:       #1a1a2e;
-  --surface-alt:   #16213e;
-  --border:        #374151;
-  --text:          #e0e0e0;
-  --text-muted:    #9ca3af;
-  --primary:       #6366f1;
-  --primary-hover: #818cf8;
-  --danger:        #ef4444;
-  --danger-hover:  #f87171;
-  --success:       #22c55e;
+  --surface-alt:   #232346;
+  --surface-hover: #2a2a52;
+  --border:        #2d2d56;
+  --text:          #e8e8f0;
+  --text-muted:    #9494b8;
+  --primary:       #818cf8;
+  --primary-light: rgba(129, 140, 248, 0.15);
+  --primary-hover: #6366f1;
+  --primary-glow:  rgba(129, 140, 248, 0.3);
+  --danger:        #f87171;
+  --danger-hover:  #ef4444;
+  --success:       #34d399;
+  --success-light: rgba(52, 211, 153, 0.15);
   --error-text:    #f87171;
   --error-bg:      #2d1515;
 
-  --shadow:        0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md:     0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow:        0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md:     0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 15px rgba(0, 0, 0, 0.2);
+  --shadow-lg:     0 10px 25px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.2);
+  --shadow-xl:     0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* ==========================================================================
-   Reset & Base
-   ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -78,92 +87,106 @@
 
 html {
   font-size: 16px;
-  /* Smooth theme transitions after initial load — class swap on <html>
-     makes all var() references animate. */
   transition: background-color var(--transition), color var(--transition);
 }
 
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-md);
-  line-height: 1.5;
-  background-color: var(--bg);
+  line-height: 1.6;
+  background: var(--bg-gradient);
   color: var(--text);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ==========================================================================
-   Layout
-   ========================================================================== */
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-md) var(--space-xl);
-  background-color: var(--surface);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .dashboard-title {
-  font-size: var(--font-size-xl);
-  font-weight: 700;
-  color: var(--text);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--primary), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .dashboard-main {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
-  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: var(--space-xl);
   padding: var(--space-xl);
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* ==========================================================================
-   Widget Card
-   ========================================================================== */
 .widget {
-  background-color: var(--surface);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.widget:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
 }
 
 .widget-title {
   font-size: var(--font-size-lg);
-  font-weight: 600;
-  margin-bottom: var(--space-md);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
   color: var(--text);
+  letter-spacing: -0.01em;
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--primary-light);
 }
 
-/* ==========================================================================
-   Greeting Widget
-   ========================================================================== */
 .greeting-widget {
   text-align: center;
 }
 
 .clock {
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--primary);
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(135deg, var(--primary), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: var(--space-xs);
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
 .date {
   font-size: var(--font-size-md);
   color: var(--text-muted);
   margin-bottom: var(--space-md);
+  font-weight: 500;
 }
 
 .greeting-text {
   font-size: var(--font-size-2xl);
-  font-weight: 600;
-  margin-bottom: var(--space-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-xl);
+  color: var(--text);
 }
 
 .name-form {
@@ -179,7 +202,7 @@ body {
   max-width: 260px;
   height: var(--touch-target);
   padding: 0 var(--space-md);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   background-color: var(--surface-alt);
   color: var(--text);
@@ -191,23 +214,26 @@ body {
 .name-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* ==========================================================================
-   Timer Widget
-   ========================================================================== */
 .timer-widget {
   text-align: center;
 }
 
 .timer-display {
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
   color: var(--text);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-lg);
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  background: var(--surface-alt);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius);
+  display: inline-block;
+  min-width: 220px;
 }
 
 .timer-controls {
@@ -233,7 +259,7 @@ body {
   width: 90px;
   height: 36px;
   padding: 0 var(--space-sm);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   background-color: var(--surface-alt);
   color: var(--text);
@@ -246,30 +272,33 @@ body {
 .duration-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .timer-notification {
-  margin-top: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--primary);
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: linear-gradient(135deg, var(--success), #059669);
   color: #fff;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-md);
-  font-weight: 500;
+  border-radius: var(--radius);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  animation: notifPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes notifPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .timer-notification.hidden {
   display: none;
 }
 
-/* ==========================================================================
-   Task Manager Widget
-   ========================================================================== */
 .add-form {
   display: flex;
   gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
   flex-wrap: wrap;
 }
 
@@ -278,7 +307,7 @@ body {
   min-width: 0;
   height: var(--touch-target);
   padding: 0 var(--space-md);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   background-color: var(--surface-alt);
   color: var(--text);
@@ -290,7 +319,7 @@ body {
 .text-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .sort-controls {
@@ -315,20 +344,31 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background-color: var(--surface-alt);
-  transition: background-color var(--transition), box-shadow var(--transition);
+  transition: background-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .task-item:hover {
-  background-color: var(--surface);
+  background-color: var(--surface-hover);
   box-shadow: var(--shadow);
+  transform: translateX(4px);
 }
 
 .task-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   accent-color: var(--primary);
   cursor: pointer;
   flex-shrink: 0;
+  border-radius: 4px;
+  transition: transform var(--transition);
+}
+
+.task-checkbox:hover {
+  transform: scale(1.15);
+}
+
+.task-checkbox:checked {
+  accent-color: var(--success);
 }
 
 .task-text {
@@ -336,6 +376,7 @@ body {
   min-width: 0;
   word-break: break-word;
   font-size: var(--font-size-md);
+  font-weight: 500;
 }
 
 .task-text.done {
@@ -347,7 +388,7 @@ body {
   flex: 1;
   height: 36px;
   padding: 0 var(--space-sm);
-  border: 1px solid var(--primary);
+  border: 2px solid var(--primary);
   border-radius: var(--radius-sm);
   background-color: var(--surface);
   color: var(--text);
@@ -355,9 +396,11 @@ body {
   font-family: var(--font-family);
 }
 
-/* ==========================================================================
-   Quick Links Widget
-   ========================================================================== */
+.task-edit-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
 .link-grid {
   display: flex;
   flex-wrap: wrap;
@@ -385,26 +428,24 @@ body {
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
   font-weight: 500;
-  transition: background-color var(--transition), border-color var(--transition), transform var(--transition);
+  transition: background-color var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   word-break: break-all;
 }
 
 .link-btn:hover,
 .link-btn:focus {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #818cf8);
   border-color: var(--primary);
   color: #fff;
   outline: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .link-btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -412,35 +453,44 @@ body {
   min-height: var(--touch-target);
   min-width: var(--touch-target);
   padding: 0 var(--space-md);
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #818cf8);
   color: #ffffff;
-  border: 1px solid transparent;
+  border: none;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-md);
   font-family: var(--font-family);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition), box-shadow var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .btn:hover {
-  background-color: var(--primary-hover);
+  box-shadow: 0 4px 14px var(--primary-glow);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .btn-secondary {
-  background-color: transparent;
+  background: transparent;
   color: var(--text);
-  border-color: var(--border);
+  border: 2px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--surface-alt);
+  background: var(--surface-alt);
+  border-color: var(--text-muted);
+  box-shadow: none;
+  transform: translateY(-1px);
 }
 
 .btn-small {
@@ -450,9 +500,9 @@ body {
 }
 
 .btn-icon {
-  background-color: transparent;
+  background: transparent;
   color: var(--text-muted);
-  border-color: transparent;
+  border: none;
   min-width: 36px;
   min-height: 36px;
   padding: 0;
@@ -462,72 +512,80 @@ body {
 .btn-icon:hover {
   color: var(--danger);
   background-color: var(--error-bg);
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-danger {
-  background-color: transparent;
+  background: transparent;
   color: var(--danger);
-  border-color: var(--border);
+  border: 2px solid var(--danger);
 }
 
 .btn-danger:hover {
-  background-color: var(--danger);
+  background: var(--danger);
   color: #fff;
+  box-shadow: none;
 }
 
-/* Sort button active state */
 .btn-sort {
-  background-color: transparent;
+  background: transparent;
   color: var(--text-muted);
-  border-color: var(--border);
+  border: 2px solid var(--border);
   min-height: 36px;
   padding: 0 var(--space-sm);
   font-size: var(--font-size-sm);
+  font-weight: 500;
 }
 
 .btn-sort:hover {
-  background-color: var(--surface-alt);
+  background: var(--surface-alt);
   color: var(--text);
+  border-color: var(--text-muted);
+  box-shadow: none;
+  transform: translateY(-1px);
 }
 
 .btn-sort-active {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #818cf8);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: transparent;
+  font-weight: 600;
 }
 
 .btn-sort-active:hover {
-  background-color: var(--primary-hover);
+  background: linear-gradient(135deg, var(--primary-hover), var(--primary));
+  box-shadow: 0 4px 14px var(--primary-glow);
+  color: #fff;
+  border-color: transparent;
+  transform: translateY(-1px);
 }
 
-/* Theme toggle button */
 .theme-toggle-btn {
   min-height: var(--touch-target);
   min-width: var(--touch-target);
   padding: 0;
-  background-color: transparent;
-  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-lg);
   cursor: pointer;
-  transition: background-color var(--transition);
+  transition: background-color var(--transition), transform var(--transition), box-shadow var(--transition);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .theme-toggle-btn:hover {
-  background-color: var(--surface-alt);
+  background: var(--surface-hover);
+  transform: rotate(15deg);
 }
 
 .theme-toggle-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
-/* ==========================================================================
-   Error Messages
-   ========================================================================== */
 .error-msg {
   font-size: var(--font-size-sm);
   color: var(--error-text);
@@ -537,15 +595,14 @@ body {
   margin-bottom: var(--space-sm);
   min-height: 0;
   transition: opacity var(--transition);
+  font-weight: 500;
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .error-msg:empty {
   display: none;
 }
 
-/* ==========================================================================
-   Utility
-   ========================================================================== */
 .hidden {
   display: none !important;
 }
@@ -562,9 +619,6 @@ body {
   border: 0;
 }
 
-/* ==========================================================================
-   Responsive — minimum 320 px width supported
-   ========================================================================== */
 @media (max-width: 480px) {
   .dashboard-header {
     padding: var(--space-sm) var(--space-md);
@@ -580,11 +634,12 @@ body {
   }
 
   .clock {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
   }
 
   .timer-display {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
+    min-width: 160px;
   }
 
   .greeting-text {
