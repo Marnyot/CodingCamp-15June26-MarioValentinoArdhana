@@ -345,7 +345,9 @@ Dashboard.tick        = tick;
    ========================================================================== */
 
 /** Module-level timer state */
-var _timerState = { remaining: 1500, running: false, intervalId: null };
+var _timerState = { remaining: 1500, running: false };
+/** Handle for the 1-second interval ID (kept separate so tick() doesn't lose it) */
+var _timerIntervalId = null;
 /** Handle for the 5-second auto-dismiss timeout after completion */
 var _timerNotifyTimeout = null;
 
@@ -370,7 +372,8 @@ Dashboard.timer = {
    * Requirements: 4.1, 4.7, 4.8
    */
   init: function () {
-    _timerState = { remaining: 1500, running: false, intervalId: null };
+    _timerState = { remaining: 1500, running: false };
+    _timerIntervalId = null;
     _timerRender();
 
     var startBtn = document.getElementById('timer-start');
@@ -419,15 +422,15 @@ Dashboard.timer = {
 
     _timerState.running = true;
 
-    _timerState.intervalId = setInterval(function () {
+    _timerIntervalId = setInterval(function () {
       // Advance the state by one tick
       _timerState = tick(_timerState);
       _timerRender();
 
       // Check for completion
       if (_timerState.remaining === 0) {
-        clearInterval(_timerState.intervalId);
-        _timerState.intervalId = null;
+        clearInterval(_timerIntervalId);
+        _timerIntervalId = null;
 
         // Show completion notification (Requirement 4.6)
         var notif = document.getElementById('timer-notification');
@@ -452,9 +455,9 @@ Dashboard.timer = {
    * Requirements: 4.3
    */
   stop: function () {
-    clearInterval(_timerState.intervalId);
+    clearInterval(_timerIntervalId);
     _timerState.running = false;
-    _timerState.intervalId = null;
+    _timerIntervalId = null;
     _timerRender();
   },
 
@@ -464,11 +467,12 @@ Dashboard.timer = {
    * Requirements: 4.1, 4.5
    */
   reset: function () {
-    clearInterval(_timerState.intervalId);
+    clearInterval(_timerIntervalId);
     clearTimeout(_timerNotifyTimeout);
     _timerNotifyTimeout = null;
 
-    _timerState = { remaining: 1500, running: false, intervalId: null };
+    _timerState = { remaining: 1500, running: false };
+    _timerIntervalId = null;
 
     // Hide any visible notification immediately (Requirement 4.8)
     var notif = document.getElementById('timer-notification');
